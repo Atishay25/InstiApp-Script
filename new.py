@@ -8,12 +8,12 @@ from selenium.webdriver.common.keys import Keys
 import time
 
 #url of the page we want to scrape
-url = "https://www.naukri.com/top-jobs-by-designations# desigtop600"
+url = "https://www.insti.app/feed"
 
 # initiating the webdriver. Parameter includes the path of the webdriver.
 options = webdriver.ChromeOptions()
-options.binary_location = "/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
-chrome_driver_binary = "/mnt/f/cp/chromedriver.exe"
+options.binary_location = "/usr/bin/google-chrome"
+chrome_driver_binary = "chromedriver"
 driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
 driver.get(url)
 # this is just to ensure that the page is loaded
@@ -26,7 +26,7 @@ html = driver.page_source
 
 # Now, we could simply apply bs4 to html variable
 soup = BeautifulSoup(html, "html.parser")
-all_divs = soup.find('div', {'id' : 'nameSearch'})
+"""all_divs = soup.find('div', {'id' : 'nameSearch'})
 job_profiles = all_divs.find_all('a')
 
 # printing top ten job profiles
@@ -35,6 +35,19 @@ for job_profile in job_profiles :
 	print(job_profile.text)
 	count = count + 1
 	if(count == 10) :
-		break
+		break"""
+events = list()
+for i in soup.find_all('app-event-card'):
+	event =[]
+	for j in i.find_all('p'):
+		event.append(j.text)
+	events.append(event)
+
+with open('events.txt', 'w') as fp:
+    for i in events:
+        fp.write(i[0])
+        fp.write(';')
+        fp.write(i[1])
+        fp.write('\n')
 
 driver.close() # closing the webdriver
