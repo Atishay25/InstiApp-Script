@@ -8,12 +8,44 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import requests
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
+#url of the page we want to scrape
+url = "https://www.insti.app/feed"
+
 
 def main():
+
+    # initiating the webdriver. Parameter includes the path of the webdriver.
+    options = webdriver.ChromeOptions()
+    options.binary_location = "/usr/bin/google-chrome"
+    chrome_driver_binary = "chromedriver"
+    driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
+    driver.get(url)
+    # this is just to ensure that the page is loaded
+    time.sleep(5)
+
+    html = driver.page_source
+    soup = BeautifulSoup(html, "html.parser")
+    insti_events = list()
+    for i in soup.find_all('app-event-card'):
+      eventdetail = []
+      for j in i.find_all('p'):
+        eventdetail.append(j.text)
+      insti_events.append(eventdetail)
+    with open('events.txt','w') as fp:
+      for i in insti_events:
+        fp.write(i[0])
+        fp.write(';')
+        fp.write(i[1])
+        fp.write('\n')
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     """
@@ -58,33 +90,34 @@ def main():
 # https://developers.google.com/calendar/quickstart/python
 # Change the scope to 'https://www.googleapis.com/auth/calendar' and delete any
 # stored credentials.
-
-        event = {
-            'summary': 'Google I/O 2015',
-            'location': '800 Howard St., San Francisco, CA 94103',
-            'description': 'A chance to hear more about Google\'s developer products.',
-            'start': {
-              'dateTime': '2015-05-28T09:00:00-07:00',
-              'timeZone': 'America/Los_Angeles',
-            },
-            'end': {
-              'dateTime': '2015-05-28T17:00:00-07:00',
-              'timeZone': 'America/Los_Angeles',
-            },
-            'recurrence': [
-              'RRULE:FREQ=DAILY;COUNT=2'
-            ],
-            'attendees': [
-              {'email': 'atishayjain2552@gmail.com'},
-            ],
-            'reminders': {
-              'useDefault': False,
-              'overrides': [
-                {'method': 'email', 'minutes': 24 * 60},
-                {'method': 'popup', 'minutes': 10},
+        final_events = list()
+        for i in range(insti_events):
+          event = {
+              'summary': i[0],
+              'location': 'this is location',
+              'description': 'this is description',
+              'start': {
+                'dateTime': '2022-12-28T09:00:00-07:00',
+                'timeZone': 'GMT+5:30',
+              },
+              'end': {
+                'dateTime': '2022-12-28T17:00:00-07:00',
+                'timeZone': 'GMT+5:30',
+              },
+              'recurrence': [
+                'RRULE:FREQ=DAILY;COUNT=1'
               ],
-            },
-        }       
+              'attendees': [
+                {'email': ''},
+              ],
+              'reminders': {
+                'useDefault': False,
+                'overrides': [
+                  {'method': 'email', 'minutes': 24 * 60},
+                  {'method': 'popup', 'minutes': 10},
+                ],
+              },
+          }       
 
         event = service.events().insert(calendarId='primary', body=event).execute()
         print('Event created: %s' % (event.get('htmlLink')))
