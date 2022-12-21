@@ -91,17 +91,17 @@ def main():
 # Change the scope to 'https://www.googleapis.com/auth/calendar' and delete any
 # stored credentials.
         final_events = list()
-        for i in range(insti_events):
+        for i in insti_events:
           event = {
               'summary': i[0],
               'location': 'this is location',
               'description': 'this is description',
               'start': {
-                'dateTime': '2022-12-28T09:00:00-07:00',
+                'dateTime': i[1].strip()[1],
                 'timeZone': 'GMT+5:30',
               },
               'end': {
-                'dateTime': '2022-12-28T17:00:00-07:00',
+                'dateTime': i[1].strip()[3],
                 'timeZone': 'GMT+5:30',
               },
               'recurrence': [
@@ -118,9 +118,10 @@ def main():
                 ],
               },
           }       
-
-        event = service.events().insert(calendarId='primary', body=event).execute()
-        print('Event created: %s' % (event.get('htmlLink')))
+          final_events.append(event)
+        for i in final_events:
+          i = service.events().insert(calendarId='primary', body=i).execute()
+          print('Event created: %s' % (i.get('htmlLink')))
 
 
     except HttpError as error:
