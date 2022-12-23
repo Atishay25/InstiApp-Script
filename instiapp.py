@@ -11,7 +11,7 @@ url = "https://www.insti.app/feed"
 options = webdriver.ChromeOptions()
 options.binary_location = "/usr/bin/google-chrome"
 chrome_driver_binary = "chromedriver"
-driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
+driver = webdriver.Chrome(chrome_driver_binary, options=options)
 driver.get(url)
 # this is just to ensure that the page is loaded
 time.sleep(5)
