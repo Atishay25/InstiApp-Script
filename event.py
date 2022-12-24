@@ -107,28 +107,29 @@ def main():
 # stored credentials.
         final_events = list()
         for i in insti_events:
-          print('i[0]',i[0])
-          print('i[1]',i[1])
-          date = i[1].strip()[-2][:1]
-          month = months[i[1].strip()[-1]]
-          time = i[1].strip()[-4]
+          print('i[0]',i[0].split())
+          print('i[1]',i[1].split())
+          date = i[1].split()[-2][:1]
+          month = months[i[1].split()[-1]]
+          eventtime = i[1].split()[-4]
+          print('2022-'+month+'-'+date+'T'+eventtime+':00')
           event = {
               'summary': i[0],
               'location': 'this is location',
               'description': 'this is description',
               'start': {
-                'dateTime': '2022-'+month+'-'+date+'T'+time+':00',
+                'dateTime': '2022-'+month+'-'+date+'T'+eventtime+':00',
                 'timeZone': 'GMT+5:30',
               },
               'end': {
-                'dateTime': '2022-'+month+'-'+date+'T'+time+':00',
+                'dateTime': '2022-'+month+'-'+date+'T'+eventtime+':00',
                 'timeZone': 'GMT+5:30',
               },
               'recurrence': [
                 'RRULE:FREQ=DAILY;COUNT=1'
               ],
               'attendees': [
-                {'email': ''},
+                {'email': 'atishayjain2552@gmail.com'},
               ],
               'reminders': {
                 'useDefault': False,
