@@ -11,6 +11,7 @@ from googleapiclient.errors import HttpError
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 
@@ -105,18 +106,29 @@ def main():
 # https://developers.google.com/calendar/quickstart/python
 # Change the scope to 'https://www.googleapis.com/auth/calendar' and delete any
 # stored credentials.
+        desc = list()
+        for j in driver.find_elements(By.TAG_NAME,'app-event-card'):
+          ev = j.click()
+          time.sleep(5)
+          soup1 = BeautifulSoup(driver.page_source, "html.parser")
+          d = soup1.find('div', attrs={'class':'description markdown'})
+          desc.append(d.getText())
+
         final_events = list()
+        k = 0
         for i in insti_events:
           print('i[0]',i[0].split())
           print('i[1]',i[1].split())
-          date = i[1].split()[-2][:1]
+          dateElement = i[1].split()[-2]
+          date = dateElement[:len(dateElement)-2]
           month = months[i[1].split()[-1]]
           eventtime = i[1].split()[-4]
+          print("DESC \n", desc[k])
           print('2022-'+month+'-'+date+'T'+eventtime+':00')
           event = {
               'summary': i[0],
               'location': 'this is location',
-              'description': 'this is description',
+              'description': desc[k],
               'start': {
                 'dateTime': '2022-'+month+'-'+date+'T'+eventtime+':00',
                 'timeZone': 'GMT+5:30',
@@ -140,6 +152,7 @@ def main():
               },
           }       
           final_events.append(event)
+          k += 1
         for i in final_events:
           i = service.events().insert(calendarId='primary', body=i).execute()
           print('Event created: %s' % (i.get('htmlLink')))

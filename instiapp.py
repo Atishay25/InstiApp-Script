@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
@@ -34,6 +35,7 @@ for job_profile in job_profiles :
 	if(count == 10) :
 		break"""
 events = list()
+ev = soup.find_all('app-event-card')
 for i in soup.find_all('app-event-card'):
 	event =[]
 	for j in i.find_all('p'):
@@ -46,5 +48,13 @@ with open('events.txt', 'w') as fp:
         fp.write(';')
         fp.write(i[1])
         fp.write('\n')
+with open('source.html', 'w') as op:
+	op.write(driver.page_source)
 
+elem = driver.find_element(By.TAG_NAME,'app-event-card').click()
+with open('source1.html', 'w') as op:
+	op.write(driver.page_source)
+time.sleep(5)
+s = BeautifulSoup(driver.page_source, "html.parser")
+print(s.find('div', attrs={"class":"event-body"}).get_text())
 driver.close() # closing the webdriver
