@@ -38,7 +38,8 @@ months = {
 
 
 def main():
-
+    print("Provide your email address: ")
+    attendeeMail = input()
     # initiating the webdriver. Parameter includes the path of the webdriver.
     options = webdriver.ChromeOptions()
     options.binary_location = "/usr/bin/google-chrome"
@@ -54,6 +55,19 @@ def main():
     for i in soup.find_all('app-event-card'):
       eventdetail = []
       for j in i.find_all('p'):
+        eventdetail.append(j.text)
+      insti_events.append(eventdetail)
+    with open('events.txt','w') as fp:
+      for i in insti_events:
+        fp.write(i[0])
+        fp.write(';')
+        fp.write(i[1])
+        fp.write('\n')
+    for i in soup.find_all('mat-card'):
+      eventdetail = []
+      for j in i.find_all('div'):
+        eventdetail.append(j.text)
+      for j in i.find_all('span'):
         eventdetail.append(j.text)
       insti_events.append(eventdetail)
     with open('events.txt','w') as fp:
@@ -88,7 +102,7 @@ def main():
 
         # Call the Calendar API
         now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-        print('Getting the upcoming 10 events')
+        print('Getting the upcoming event details')
         events_result = service.events().list(calendarId='primary', timeMin=now,
                                               maxResults=10, singleEvents=True,
                                               orderBy='startTime').execute()
@@ -103,11 +117,17 @@ def main():
         #    start = event['start'].get('dateTime', event['start'].get('date'))
         #    print(start, event['summary'])
         # Refer to the Python quickstart on how to setup the environment:
-# https://developers.google.com/calendar/quickstart/python
-# Change the scope to 'https://www.googleapis.com/auth/calendar' and delete any
-# stored credentials.
+        # https://developers.google.com/calendar/quickstart/python
+        # Change the scope to 'https://www.googleapis.com/auth/calendar' and delete any
+        # stored credentials.
         desc = list()
         for j in driver.find_elements(By.TAG_NAME,'app-event-card'):
+          ev = j.click()
+          time.sleep(5)
+          soup1 = BeautifulSoup(driver.page_source, "html.parser")
+          d = soup1.find('div', attrs={'class':'description markdown'})
+          desc.append(d.getText())
+        for j in driver.find_elements(By.TAG_NAME,'mat-card'):
           ev = j.click()
           time.sleep(5)
           soup1 = BeautifulSoup(driver.page_source, "html.parser")
@@ -117,31 +137,55 @@ def main():
         final_events = list()
         k = 0
         for i in insti_events:
-          print('i[0]',i[0].split())
-          print('i[1]',i[1].split())
+          # print('i[0]',i[0].split())
+          # print('i[1]',i[1].split())
           dateElement = i[1].split()[-2]
+          venue = 'IIT Bombay'
           date = dateElement[:len(dateElement)-2]
-          month = months[i[1].split()[-1]]
+          month = 'month'
           eventtime = i[1].split()[-4]
-          print("DESC \n", desc[k])
-          print('2022-'+month+'-'+date+'T'+eventtime+':00')
+          if i[1].split()[-1] in months.keys():
+            # print("SAHI H")
+            month = months[i[1].split()[-1]]
+          else:
+            exact_venue = []
+            reversed_details = i[1].split().copy()
+            reversed_details.reverse()
+            date_index = 0
+            for word in reversed_details:
+              date_index += 1
+              if word == '|':
+                break
+              else:
+                exact_venue.append(word)
+            exact_venue.reverse()
+            venue_name = ''
+            for word in exact_venue:
+              venue_name += word
+            venue = venue_name
+            month = months[reversed_details[date_index]]
+            eventtime = reversed_details[date_index+3]
+            date = reversed_details[date_index+1]
+            date = date[:len(date)-2]
+          #print("DESC \n", desc[k])
+          print('2023-'+month+'-'+date+'T'+eventtime+':00')
           event = {
               'summary': i[0],
-              'location': 'this is location',
+              'location': venue,
               'description': desc[k],
               'start': {
-                'dateTime': '2022-'+month+'-'+date+'T'+eventtime+':00',
+                'dateTime': '2023-'+month+'-'+date+'T'+eventtime+':00',
                 'timeZone': 'GMT+5:30',
               },
               'end': {
-                'dateTime': '2022-'+month+'-'+date+'T'+eventtime+':00',
+                'dateTime': '2023-'+month+'-'+date+'T'+eventtime+':00',
                 'timeZone': 'GMT+5:30',
               },
               'recurrence': [
                 'RRULE:FREQ=DAILY;COUNT=1'
               ],
               'attendees': [
-                {'email': 'atishayjain2552@gmail.com'},
+                {'email': attendeeMail},
               ],
               'reminders': {
                 'useDefault': False,
