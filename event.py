@@ -38,7 +38,8 @@ months = {
 
 
 def main():
-
+    print("Provide your email address: ")
+    attendeeMail = input()
     # initiating the webdriver. Parameter includes the path of the webdriver.
     options = webdriver.ChromeOptions()
     options.binary_location = "/usr/bin/google-chrome"
@@ -127,21 +128,21 @@ def main():
           print('2022-'+month+'-'+date+'T'+eventtime+':00')
           event = {
               'summary': i[0],
-              'location': 'this is location',
+              'location': 'IIT Bombay',
               'description': desc[k],
               'start': {
-                'dateTime': '2022-'+month+'-'+date+'T'+eventtime+':00',
+                'dateTime': '2023-'+month+'-'+date+'T'+eventtime+':00',
                 'timeZone': 'GMT+5:30',
               },
               'end': {
-                'dateTime': '2022-'+month+'-'+date+'T'+eventtime+':00',
+                'dateTime': '2023-'+month+'-'+date+'T'+eventtime+':00',
                 'timeZone': 'GMT+5:30',
               },
               'recurrence': [
                 'RRULE:FREQ=DAILY;COUNT=1'
               ],
               'attendees': [
-                {'email': 'atishayjain2552@gmail.com'},
+                {'email': attendeeMail},
               ],
               'reminders': {
                 'useDefault': False,
