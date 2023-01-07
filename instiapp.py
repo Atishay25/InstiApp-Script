@@ -51,7 +51,7 @@ with open('events.txt', 'w') as fp:
 with open('source.html', 'w') as op:
 	op.write(driver.page_source)
 
-elem = driver.find_element(By.TAG_NAME,'app-event-card').click()
+elem = driver.find_element(By.TAG_NAME,'mat-card').click()
 with open('source1.html', 'w') as op:
 	op.write(driver.page_source)
 time.sleep(5)
